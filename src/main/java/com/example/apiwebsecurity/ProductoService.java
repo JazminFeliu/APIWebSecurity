@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductoService {
@@ -19,19 +20,19 @@ public class ProductoService {
         return productoRepository.findAll();
     }
 
-    public List<Producto> findById(Integer producto_id){
+    public Optional<Producto> findById(Integer producto_id){
         Integer id;
         try {
             id = producto_id;
         }catch (NumberFormatException e){
             id = 0;
         }
-        return productoRepository.findAllById(List.of(id));
+        return productoRepository.findById(id);
     }
 
 
-    public Producto findByName(String nombre) {
-        return findByName(nombre);
+    public List<Producto> findByName(String nombre) {
+        return productoRepository.findProductosByNombreContaining(nombre);
     }
 
     public void save(Producto producto) {

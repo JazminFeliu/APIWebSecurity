@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -25,20 +26,20 @@ public class ProductoController {
     }
 
     @GetMapping("/{producto_id}")
-    @PreAuthorize("hasAnyRole('ROLE_SELLER', 'ROLE_CLIENTE')")
-    public List<Producto> findById(@PathVariable Integer producto_id){
+    @PreAuthorize("hasAnyRole('ROLE_CLIENTE', 'ROLE_ADMIN')")
+    public Optional<Producto> findById(@PathVariable Integer producto_id){
         return productoService.findById(producto_id);
     }
 
     @GetMapping("buscar/{nombre}")
-    @PreAuthorize("hasAnyAuthority('producto:write','producto:read')")
-    public Producto findByName(@PathVariable String nombre){
+    @PreAuthorize("hasAnyAuthority('producto_write','producto_read')")
+    public List<Producto> findByName(@PathVariable String nombre){
         return productoService.findByName(nombre);
     }
 
     @PostMapping("/nuevo")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String nuevoProducto(@RequestBody Producto producto){
+    public String nuevoProducto(@RequestBody Producto producto){  // solicita los datos x json
         productoService.save(producto);
         return "nuevo Producto guardado!";
     }

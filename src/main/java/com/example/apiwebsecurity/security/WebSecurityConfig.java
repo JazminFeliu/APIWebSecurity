@@ -1,18 +1,20 @@
 package com.example.apiwebsecurity.security;
 
+import com.example.apiwebsecurity.security.auth.AppUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import static com.example.apiwebsecurity.security.UserPermission.PRODUCTO_WRITE;
 
@@ -21,6 +23,14 @@ import static com.example.apiwebsecurity.security.UserPermission.PRODUCTO_WRITE;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final AppUserService appUserService;
+
+    @Autowired
+    public WebSecurityConfig(AppUserService appUserService) {
+        this.appUserService = appUserService;
+    }
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception{
 
@@ -28,9 +38,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/","/index.html").permitAll()
-                .antMatchers(HttpMethod.PUT, "/api/productos/**").hasAuthority(PRODUCTO_WRITE.getPermission())
-                .antMatchers(HttpMethod.POST,"/api/**").hasAuthority(PRODUCTO_WRITE.getPermission())
-                .antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                //.antMatchers(HttpMethod.PUT, "/api/productos/**").hasAuthority(PRODUCTO_WRITE.getPermission())
+                //.antMatchers(HttpMethod.POST,"/api/**").hasAuthority(PRODUCTO_WRITE.getPermission())
+                //.antMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -46,31 +56,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    @Bean
-    protected UserDetailsService userDetailsService() {
-
-        UserDetails usuario1 = User.builder()
-                .username("jaz")
-                .password(passwordEncoder().encode("password"))
-                //.roles(UserRole.ADMIN.name())
-                .authorities(UserRole.ADMIN.getGrantedAuthorities())
-                .build();
-        UserDetails usuario2 = User.builder()
-                .username("juli")
-                .password(passwordEncoder().encode("password"))
-                .roles(UserRole.CLIENTE.name())
-                .build();
-        UserDetails usuario3 = User.builder()
-                .username("jesi")
-                .password(passwordEncoder().encode("password"))
-                .roles(UserRole.ADMIN.name())
-                .build();
-        UserDetails usuario4 = User.builder()
-                .username("test")
-                .password(passwordEncoder().encode("password"))
-                .authorities(UserRole.SELLER.getGrantedAuthorities())
-                .build();
-        return new InMemoryUserDetailsManager(usuario1, usuario2, usuario3, usuario4);
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
     }
 
+    @Bean
+    public AuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(appUserService);
+        return provider;
+    }
 }
