@@ -1,4 +1,4 @@
-package com.example.apiwebsecurity;
+package com.example.apiwebsecurity.producto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +16,12 @@ public class ProductoService {
         this.productoRepository = productoRepository;
     }
 
+// testeo si el findAll me devuelve correctamente la lista.
     public List<Producto> listarAll(){
         return productoRepository.findAll();
     }
 
+    //testeo si el findById me devuelve correctamente un producto por Id
     public Optional<Producto> findById(Integer producto_id){
         Integer id;
         try {

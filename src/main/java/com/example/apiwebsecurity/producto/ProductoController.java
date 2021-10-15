@@ -1,4 +1,4 @@
-package com.example.apiwebsecurity;
+package com.example.apiwebsecurity.producto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
