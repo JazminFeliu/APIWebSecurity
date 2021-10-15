@@ -1,4 +1,4 @@
-package com.example.apiwebsecurity;
+package com.example.apiwebsecurity.producto;
 
 import javax.persistence.*;
 
@@ -61,7 +61,7 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "com.example.apiwebsecurity.Producto{" +
+        return "com.example.apiwebsecurity.producto.Producto{" +
                 "id_Producto=" + producto_id +
                 ", nombre='" + nombre + '\'' +
                 ", precio=" + precio +
